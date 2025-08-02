@@ -237,5 +237,38 @@ export const moduleAPI = {
   }
 };
 
+// Progress API functions
+export const progressAPI = {
+  // Get all user's course progress
+  getUserProgress: async () => {
+    const response = await apiService.get('/progress');
+    return response.data;
+  },
+
+  // Get progress for a specific course
+  getCourseProgress: async (courseId: string) => {
+    const response = await apiService.get(`/progress/course/${courseId}`);
+    return response.data;
+  },
+
+  // Get detailed progress for a course
+  getDetailedCourseProgress: async (courseId: string) => {
+    const response = await apiService.get(`/progress/course/${courseId}/detailed`);
+    return response.data;
+  },
+
+  // Mark a lesson as completed
+  completeLesson: async (courseId: string, lessonId: string, timeSpent?: number) => {
+    const response = await apiService.post(`/progress/course/${courseId}/lesson/${lessonId}/complete`, { timeSpent });
+    return response.data;
+  },
+
+  // Update current position in course
+  updateCurrentPosition: async (courseId: string, moduleIndex: number, lessonIndex: number) => {
+    const response = await apiService.put(`/progress/course/${courseId}/position`, { moduleIndex, lessonIndex });
+    return response.data;
+  }
+};
+
 // Export singleton instance
 export const apiService = new ApiService();

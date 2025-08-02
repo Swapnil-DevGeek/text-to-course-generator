@@ -55,12 +55,25 @@ export const Topbar: React.FC<TopbarProps> = ({
         case 'lesson':
           name = `Lesson ${pathSegments[index + 1] || ''}`;
           break;
+        default:
+          // Keep the default name
+          break;
       }
 
-      // Skip adding numeric IDs as separate breadcrumbs
-      if (!/^\d+$/.test(segment)) {
+      // Skip adding numeric IDs and MongoDB ObjectIds as separate breadcrumbs
+      // But add course details breadcrumb for course IDs
+      const isId = /^\d+$/.test(segment) || /^[0-9a-fA-F]{24}$/.test(segment);
+      
+      if (!isId) {
         breadcrumbs.push({
           name,
+          href: currentPath,
+          current: isLast
+        });
+      } else if (index > 0 && pathSegments[index - 1] === 'courses') {
+        // Add "Course Details" breadcrumb for course IDs
+        breadcrumbs.push({
+          name: 'Course Details',
           href: currentPath,
           current: isLast
         });

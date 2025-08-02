@@ -1,6 +1,7 @@
 const Course = require('../models/Course');
 const Module = require('../models/Module');
 const Lesson = require('../models/Lesson');
+const Progress = require('../models/Progress');
 const aiService = require('../services/aiService');
 
 // Generate course with AI
@@ -155,11 +156,29 @@ exports.getUserCourses = async (req, res) => {
 
     const total = await Course.countDocuments(query);
 
-    // Calculate progress for each course (placeholder for now)
-    const coursesWithProgress = courses.map(course => ({
-      ...course.toJSON(),
-      progress: 0 // TODO: Implement progress tracking
-    }));
+    // Calculate progress for each course
+    const coursesWithProgress = await Promise.all(
+      courses.map(async (course) => {
+        const progress = await Progress.getOrCreateProgress(userId, course._id);
+        await progress.calculateProgress();
+        
+        // Count total lessons
+        let totalLessons = 0;
+        if (course.modules && Array.isArray(course.modules)) {
+          for (const module of course.modules) {
+            await module.populate('lessons');
+            totalLessons += module.lessons.length;
+          }
+        }
+
+        return {
+          ...course.toJSON(),
+          progress: progress.progressPercentage,
+          totalLessons: totalLessons,
+          totalModules: course.modules ? course.modules.length : 0
+        };
+      })
+    );
 
     res.json({
       success: true,

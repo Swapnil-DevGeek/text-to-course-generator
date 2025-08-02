@@ -9,7 +9,7 @@ import { ErrorMessage } from '../components/ui/ErrorMessage';
 import { courseAPI } from '../services/api';
 
 interface Course {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   difficulty: string;
@@ -17,6 +17,7 @@ interface Course {
   progress: number;
   totalModules: number;
   totalLessons: number;
+  modules?: any[];
 }
 
 export const Courses: React.FC = () => {
@@ -108,7 +109,7 @@ export const Courses: React.FC = () => {
       {/* Course Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
-          <Card key={course.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card key={course._id} className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex items-start justify-between mb-2">
                 <Badge className={getDifficultyColor(course.difficulty)}>
@@ -143,12 +144,12 @@ export const Courses: React.FC = () => {
 
                 {/* Course Stats */}
                 <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>{course.totalModules || course.modules?.length || 0} modules</span>
+                  <span>{course.totalModules || 0} modules</span>
                   <span>{course.totalLessons || 0} lessons</span>
                 </div>
 
                 {/* Action Button */}
-                <Link to={`/courses/${course._id || course.id}`} className="block">
+                <Link to={`/courses/${course._id}`} className="block">
                   <Button className="w-full">
                     {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
                   </Button>

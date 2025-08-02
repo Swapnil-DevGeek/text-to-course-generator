@@ -7,7 +7,7 @@ import { InlineLoader } from '../components/ui/LoadingSpinner';
 import { NotFoundError } from '../components/ui/ErrorMessage';
 import { LessonRenderer } from '../components/LessonRenderer';
 import { Progress } from '../components/ui/progress';
-import { lessonAPI } from '../services/api';
+import { lessonAPI, progressAPI } from '../services/api';
 
 type ContentBlock = 
   | { type: 'heading'; text: string; level?: 1 | 2 | 3 | 4 | 5 | 6 }
@@ -17,7 +17,7 @@ type ContentBlock =
   | { type: 'mcq'; question: string; options: string[]; answer: number; explanation?: string };
 
 interface LessonData {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   content: ContentBlock[];
@@ -42,6 +42,10 @@ export const LessonView: React.FC = () => {
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [moduleCompleted, setModuleCompleted] = useState(false);
+  const [showModuleCompletion, setShowModuleCompletion] = useState(false);
+  const [startTime, setStartTime] = useState<number>(Date.now());
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -55,12 +59,27 @@ export const LessonView: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await lessonAPI.getLesson(courseId, parseInt(moduleIndex), parseInt(lessonIndex));
+        const [lessonResponse, progressResponse] = await Promise.all([
+          lessonAPI.getLesson(courseId, parseInt(moduleIndex), parseInt(lessonIndex)),
+          progressAPI.getDetailedCourseProgress(courseId)
+        ]);
         
-        if (response.success && response.data) {
-          setLesson(response.data);
+        if (lessonResponse.success && lessonResponse.data) {
+          setLesson(lessonResponse.data);
+          setStartTime(Date.now());
+          
+          // Update current position
+          await progressAPI.updateCurrentPosition(courseId, parseInt(moduleIndex), parseInt(lessonIndex));
         } else {
-          setError(response.error?.message || 'Failed to load lesson');
+          setError(lessonResponse.error?.message || 'Failed to load lesson');
+        }
+
+        // Check if this lesson is already completed
+        if (progressResponse.success && progressResponse.data) {
+          const currentModule = progressResponse.data.modules[parseInt(moduleIndex)];
+          const currentLesson = currentModule?.lessons[parseInt(lessonIndex)];
+          setIsCompleted(currentLesson?.isCompleted || false);
+          setModuleCompleted(currentModule?.isCompleted || false);
         }
       } catch (err: any) {
         console.error('Error fetching lesson:', err);
@@ -75,6 +94,27 @@ export const LessonView: React.FC = () => {
 
     fetchLesson();
   }, [courseId, moduleIndex, lessonIndex]);
+
+  const handleCompleteLesson = async () => {
+    if (!lesson || !courseId || isCompleted) return;
+
+    try {
+      const timeSpent = Math.round((Date.now() - startTime) / 1000 / 60); // Time in minutes
+      const response = await progressAPI.completeLesson(courseId, lesson._id, timeSpent);
+      
+      if (response.success) {
+        setIsCompleted(true);
+        
+        // Check if module was completed
+        if (response.data.moduleCompleted && response.data.newlyCompleted) {
+          setModuleCompleted(true);
+          setShowModuleCompletion(true);
+        }
+      }
+    } catch (err) {
+      console.error('Error completing lesson:', err);
+    }
+  };
 
   if (!courseId || moduleIndex === undefined || lessonIndex === undefined) {
     return <Navigate to="/courses" replace />;
@@ -112,6 +152,7 @@ export const LessonView: React.FC = () => {
 
   const prevLessonExists = parseInt(lessonIndex) > 0;
   const nextLessonExists = parseInt(lessonIndex) < lesson.totalLessonsInModule - 1;
+  const nextModuleExists = parseInt(moduleIndex) < lesson.totalModules - 1;
   
   const prevLessonUrl = prevLessonExists 
     ? `/courses/${courseId}/module/${moduleIndex}/lesson/${parseInt(lessonIndex) - 1}`
@@ -119,6 +160,10 @@ export const LessonView: React.FC = () => {
     
   const nextLessonUrl = nextLessonExists 
     ? `/courses/${courseId}/module/${moduleIndex}/lesson/${parseInt(lessonIndex) + 1}`
+    : null;
+
+  const nextModuleUrl = nextModuleExists 
+    ? `/courses/${courseId}/module/${parseInt(moduleIndex) + 1}/lesson/0`
     : null;
 
   const courseUrl = `/courses/${courseId}`;
@@ -179,6 +224,27 @@ export const LessonView: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Lesson Completion */}
+        <div className="mt-8 text-center">
+          <Button 
+            onClick={handleCompleteLesson}
+            disabled={isCompleted}
+            size="lg"
+            className={isCompleted ? "bg-green-600 hover:bg-green-700" : ""}
+          >
+            {isCompleted ? (
+              <>
+                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Lesson Completed
+              </>
+            ) : (
+              'Mark as Complete'
+            )}
+          </Button>
+        </div>
+
         {/* Navigation */}
         <div className="flex items-center justify-between mt-8">
           <div>
@@ -205,8 +271,17 @@ export const LessonView: React.FC = () => {
           <div>
             {nextLessonUrl ? (
               <Link to={nextLessonUrl}>
-                <Button>
+                <Button disabled={!isCompleted}>
                   Next Lesson
+                  <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Button>
+              </Link>
+            ) : moduleCompleted && nextModuleUrl ? (
+              <Link to={nextModuleUrl}>
+                <Button>
+                  Next Module
                   <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -214,7 +289,7 @@ export const LessonView: React.FC = () => {
               </Link>
             ) : (
               <Button disabled>
-                Course Complete
+                {moduleCompleted ? 'Course Complete' : 'Complete Module First'}
                 <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -222,6 +297,47 @@ export const LessonView: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Module Completion Modal */}
+        {showModuleCompletion && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md mx-4">
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                  <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Module Complete!</h3>
+                <p className="text-gray-600 mb-6">
+                  Congratulations! You've completed "{lesson.moduleTitle}". 
+                  {nextModuleUrl ? ' Ready to move on to the next module?' : ' You\'ve finished the entire course!'}
+                </p>
+                <div className="flex space-x-3 justify-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowModuleCompletion(false)}
+                  >
+                    Stay Here
+                  </Button>
+                  {nextModuleUrl ? (
+                    <Link to={nextModuleUrl}>
+                      <Button onClick={() => setShowModuleCompletion(false)}>
+                        Next Module
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link to={courseUrl}>
+                      <Button onClick={() => setShowModuleCompletion(false)}>
+                        Course Overview
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
