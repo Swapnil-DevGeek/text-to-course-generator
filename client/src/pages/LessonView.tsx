@@ -7,6 +7,7 @@ import { InlineLoader } from '../components/ui/LoadingSpinner';
 import { NotFoundError } from '../components/ui/ErrorMessage';
 import { LessonRenderer } from '../components/LessonRenderer';
 import { Progress } from '../components/ui/progress';
+import { lessonAPI } from '../services/api';
 
 type ContentBlock = 
   | { type: 'heading'; text: string; level?: 1 | 2 | 3 | 4 | 5 | 6 }
@@ -54,92 +55,19 @@ export const LessonView: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Mock API call - replace with actual API
-        await new Promise(resolve => setTimeout(resolve, 800));
+        const response = await lessonAPI.getLesson(courseId, parseInt(moduleIndex), parseInt(lessonIndex));
         
-        // Mock lesson data
-        const mockLesson: LessonData = {
-          id: `${courseId}-${moduleIndex}-${lessonIndex}`,
-          title: 'Introduction to Artificial Intelligence',
-          description: 'Learn the fundamental concepts of AI and how it impacts our daily lives.',
-          courseId,
-          courseName: 'AI Fundamentals Course',
-          moduleIndex: parseInt(moduleIndex),
-          lessonIndex: parseInt(lessonIndex),
-          totalModules: 3,
-          totalLessonsInModule: 4,
-          moduleTitle: 'AI Basics',
-          estimatedDuration: '30 minutes',
-          completed: false,
-          content: [
-            {
-              type: 'heading',
-              text: 'What is Artificial Intelligence?',
-              level: 1
-            },
-            {
-              type: 'paragraph',
-              text: 'Artificial Intelligence (AI) is a branch of computer science that aims to create intelligent machines that work and react like humans. It encompasses various subfields including machine learning, natural language processing, computer vision, and robotics.'
-            },
-            {
-              type: 'heading',
-              text: 'Key Concepts',
-              level: 2
-            },
-            {
-              type: 'paragraph',
-              text: 'Before diving deeper into AI, let\'s understand some fundamental concepts:'
-            },
-            {
-              type: 'code',
-              language: 'python',
-              text: `# Simple AI decision making example
-def ai_decision(input_data):
-    if input_data > 0.7:
-        return "high_confidence"
-    elif input_data > 0.3:
-        return "medium_confidence"
-    else:
-        return "low_confidence"
-
-# Example usage
-result = ai_decision(0.85)
-print(f"AI Decision: {result}")`
-            },
-            {
-              type: 'video',
-              url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-              title: 'AI in Everyday Life',
-              description: 'See how AI is already integrated into our daily routines'
-            },
-            {
-              type: 'heading',
-              text: 'Test Your Understanding',
-              level: 2
-            },
-            {
-              type: 'mcq',
-              question: 'Which of the following is NOT a primary goal of Artificial Intelligence?',
-              options: [
-                'To simulate human intelligence',
-                'To replace all human workers',
-                'To solve complex problems',
-                'To automate repetitive tasks'
-              ],
-              answer: 1,
-              explanation: 'While AI can automate many tasks, its primary goal is not to replace all human workers but to augment human capabilities and solve complex problems that are difficult for traditional programming approaches.'
-            },
-            {
-              type: 'paragraph',
-              text: 'Great work! You\'ve completed the introduction to AI. In the next lesson, we\'ll explore the different types of AI systems and their applications.'
-            }
-          ]
-        };
-
-        setLesson(mockLesson);
-      } catch (err) {
-        setError('Failed to load lesson');
+        if (response.success && response.data) {
+          setLesson(response.data);
+        } else {
+          setError(response.error?.message || 'Failed to load lesson');
+        }
+      } catch (err: any) {
         console.error('Error fetching lesson:', err);
+        const errorMessage = err?.response?.data?.error?.message || 
+                            err?.message || 
+                            'Failed to load lesson';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -155,7 +83,18 @@ print(f"AI Decision: {result}")`
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-6">
-        <InlineLoader text="Loading lesson..." />
+        <div className="text-center py-12">
+          <div className="animate-spin mx-auto h-8 w-8 text-blue-600 mb-4">
+            <svg fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Loading lesson...</h3>
+          <p className="text-gray-500">
+            {lesson ? 'Preparing content...' : 'This may take a moment if AI is generating content for the first time.'}
+          </p>
+        </div>
       </div>
     );
   }

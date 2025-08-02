@@ -11,10 +11,10 @@ import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
 import { AuthCallback } from '@/pages/AuthCallback';
-import { LessonDemo } from '@/pages/LessonDemo';
 import { Courses } from '@/pages/Courses';
 import { CourseView } from '@/pages/CourseView';
 import { LessonView } from '@/pages/LessonView';
+import { CreateCourse } from '@/pages/CreateCourse';
 
 // Toast provider
 import { Toaster } from '@/components/ui/sonner';
@@ -36,7 +36,6 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/lesson-demo" element={<LessonDemo />} />
             
             {/* Auth routes - redirect to dashboard if already authenticated */}
             <Route 
@@ -108,14 +107,12 @@ function App() {
               element={
                 <ProtectedRoute requireAuth={true}>
                   <Layout>
-                    <div className="max-w-4xl mx-auto p-6">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-6">Create New Course</h1>
-                      <p className="text-gray-600">Course creation feature coming soon...</p>
-                    </div>
+                    <CreateCourse />
                   </Layout>
                 </ProtectedRoute>
               } 
             />
+            
             
             {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
+import { InlineLoader } from '../components/ui/LoadingSpinner';
+import { ErrorMessage } from '../components/ui/ErrorMessage';
+import { courseAPI } from '../services/api';
 
 interface Course {
   id: string;
@@ -17,39 +20,35 @@ interface Course {
 }
 
 export const Courses: React.FC = () => {
-  // Mock courses data
-  const courses: Course[] = [
-    {
-      id: '1',
-      title: 'Introduction to Artificial Intelligence',
-      description: 'A comprehensive course covering the fundamentals of AI, machine learning, and their real-world applications.',
-      difficulty: 'Beginner',
-      estimatedDuration: '4 weeks',
-      progress: 65,
-      totalModules: 3,
-      totalLessons: 12
-    },
-    {
-      id: '2',
-      title: 'Web Development with React',
-      description: 'Learn modern web development with React, including hooks, context, and advanced patterns.',
-      difficulty: 'Intermediate',
-      estimatedDuration: '6 weeks',
-      progress: 30,
-      totalModules: 5,
-      totalLessons: 18
-    },
-    {
-      id: '3',
-      title: 'Data Science Fundamentals',
-      description: 'Master the basics of data science, including statistics, Python programming, and data visualization.',
-      difficulty: 'Beginner',
-      estimatedDuration: '8 weeks',
-      progress: 0,
-      totalModules: 6,
-      totalLessons: 24
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await courseAPI.getCourses();
+      
+      if (response.success && response.data) {
+        setCourses(response.data.courses || []);
+      } else {
+        setError('Failed to fetch courses');
+      }
+    } catch (err: any) {
+      console.error('Error fetching courses:', err);
+      const errorMessage = err?.response?.data?.error?.message || 
+                          err?.message || 
+                          'Failed to fetch courses';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -63,6 +62,26 @@ export const Courses: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <InlineLoader text="Loading your courses..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <ErrorMessage
+          title="Failed to Load Courses"
+          message={error}
+          onRetry={fetchCourses}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -124,12 +143,12 @@ export const Courses: React.FC = () => {
 
                 {/* Course Stats */}
                 <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>{course.totalModules} modules</span>
-                  <span>{course.totalLessons} lessons</span>
+                  <span>{course.totalModules || course.modules?.length || 0} modules</span>
+                  <span>{course.totalLessons || 0} lessons</span>
                 </div>
 
                 {/* Action Button */}
-                <Link to={`/courses/${course.id}`} className="block">
+                <Link to={`/courses/${course._id || course.id}`} className="block">
                   <Button className="w-full">
                     {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
                   </Button>

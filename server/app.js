@@ -10,6 +10,9 @@ const { generalLimiter } = require('./middleware/rateLimiter');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const courseRoutes = require('./routes/courses');
+const moduleRoutes = require('./routes/modules');
+const lessonRoutes = require('./routes/lessons');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,12 +55,18 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: '/api/auth',
+      courses: '/api/courses',
+      modules: '/api/modules',
+      lessons: '/api/lessons',
       health: '/api/health'
     }
   });
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/modules', moduleRoutes);
+app.use('/api/lessons', lessonRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

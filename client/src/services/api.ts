@@ -156,5 +156,86 @@ class ApiService {
   }
 }
 
+// Course API functions
+export const courseAPI = {
+  // Generate course with AI
+  generateCourse: async (data: { topic: string; difficulty?: string; duration?: string }) => {
+    const response = await apiService.post('/courses/generate', data, { timeout: 60000 }); // 60 second timeout for AI generation
+    return response.data;
+  },
+
+  // Get user's courses
+  getCourses: async (params?: { page?: number; limit?: number; search?: string; difficulty?: string }) => {
+    const response = await apiService.get('/courses', { params });
+    return response.data;
+  },
+
+  // Get specific course
+  getCourse: async (courseId: string) => {
+    const response = await apiService.get(`/courses/${courseId}`);
+    return response.data;
+  },
+
+  // Update course
+  updateCourse: async (courseId: string, data: any) => {
+    const response = await apiService.put(`/courses/${courseId}`, data);
+    return response.data;
+  },
+
+  // Delete course
+  deleteCourse: async (courseId: string) => {
+    const response = await apiService.delete(`/courses/${courseId}`);
+    return response.data;
+  }
+};
+
+// Lesson API functions
+export const lessonAPI = {
+  // Get lesson content
+  getLesson: async (courseId: string, moduleIndex: number, lessonIndex: number) => {
+    const response = await apiService.get(`/lessons/course/${courseId}/module/${moduleIndex}/lesson/${lessonIndex}`, { timeout: 60000 }); // 60 second timeout for lesson with AI generation
+    return response.data;
+  },
+
+  // Generate lesson content with AI
+  generateLessonContent: async (lessonId: string) => {
+    const response = await apiService.post(`/lessons/${lessonId}/generate`, {}, { timeout: 45000 }); // 45 second timeout for lesson generation
+    return response.data;
+  },
+
+  // Update lesson
+  updateLesson: async (lessonId: string, data: any) => {
+    const response = await apiService.put(`/lessons/${lessonId}`, data);
+    return response.data;
+  },
+
+  // Get lessons for module
+  getModuleLessons: async (moduleId: string) => {
+    const response = await apiService.get(`/lessons/module/${moduleId}`);
+    return response.data;
+  }
+};
+
+// Module API functions
+export const moduleAPI = {
+  // Get module
+  getModule: async (moduleId: string) => {
+    const response = await apiService.get(`/modules/${moduleId}`);
+    return response.data;
+  },
+
+  // Update module
+  updateModule: async (moduleId: string, data: any) => {
+    const response = await apiService.put(`/modules/${moduleId}`, data);
+    return response.data;
+  },
+
+  // Get course modules
+  getCourseModules: async (courseId: string) => {
+    const response = await apiService.get(`/modules/course/${courseId}`);
+    return response.data;
+  }
+};
+
 // Export singleton instance
 export const apiService = new ApiService();

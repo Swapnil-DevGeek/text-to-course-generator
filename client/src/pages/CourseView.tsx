@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { InlineLoader } from '../components/ui/LoadingSpinner';
 import { ErrorMessage, NotFoundError } from '../components/ui/ErrorMessage';
 import { Progress } from '../components/ui/progress';
+import { courseAPI } from '../services/api';
 
 interface Course {
   id: string;
@@ -52,94 +53,19 @@ export const CourseView: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Mock API call - replace with actual API
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const response = await courseAPI.getCourse(courseId);
         
-        // Mock course data
-        const mockCourse: Course = {
-          id: courseId,
-          title: 'Introduction to Artificial Intelligence',
-          description: 'A comprehensive course covering the fundamentals of AI, machine learning, and their real-world applications.',
-          estimatedDuration: '4 weeks',
-          difficulty: 'Beginner',
-          progress: 25,
-          modules: [
-            {
-              id: '1',
-              title: 'AI Fundamentals',
-              description: 'Learn the basic concepts and history of artificial intelligence.',
-              estimatedDuration: '1 week',
-              completed: true,
-              lessons: [
-                {
-                  id: '1',
-                  title: 'What is Artificial Intelligence?',
-                  description: 'Introduction to AI concepts and definitions.',
-                  estimatedDuration: '30 min',
-                  completed: true
-                },
-                {
-                  id: '2',
-                  title: 'History of AI',
-                  description: 'Timeline and evolution of AI technology.',
-                  estimatedDuration: '45 min',
-                  completed: true
-                },
-                {
-                  id: '3',
-                  title: 'Types of AI Systems',
-                  description: 'Understanding different categories of AI.',
-                  estimatedDuration: '40 min',
-                  completed: false
-                }
-              ]
-            },
-            {
-              id: '2',
-              title: 'Machine Learning Basics',
-              description: 'Understanding the core concepts of machine learning.',
-              estimatedDuration: '1.5 weeks',
-              completed: false,
-              lessons: [
-                {
-                  id: '1',
-                  title: 'Introduction to Machine Learning',
-                  description: 'What is ML and how does it relate to AI?',
-                  estimatedDuration: '35 min',
-                  completed: false
-                },
-                {
-                  id: '2',
-                  title: 'Supervised Learning',
-                  description: 'Understanding supervised learning algorithms.',
-                  estimatedDuration: '50 min',
-                  completed: false
-                }
-              ]
-            },
-            {
-              id: '3',
-              title: 'Deep Learning',
-              description: 'Advanced topics in neural networks and deep learning.',
-              estimatedDuration: '1.5 weeks',
-              completed: false,
-              lessons: [
-                {
-                  id: '1',
-                  title: 'Neural Networks',
-                  description: 'Introduction to artificial neural networks.',
-                  estimatedDuration: '60 min',
-                  completed: false
-                }
-              ]
-            }
-          ]
-        };
-
-        setCourse(mockCourse);
-      } catch (err) {
-        setError('Failed to load course');
+        if (response.success && response.data) {
+          setCourse(response.data);
+        } else {
+          setError('Failed to load course');
+        }
+      } catch (err: any) {
         console.error('Error fetching course:', err);
+        const errorMessage = err?.response?.data?.error?.message || 
+                            err?.message || 
+                            'Failed to load course';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

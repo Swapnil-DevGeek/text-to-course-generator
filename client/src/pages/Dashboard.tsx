@@ -1,9 +1,43 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { courseAPI } from '../services/api';
+
+interface Course {
+  id: string;
+  _id?: string;
+  title: string;
+  description: string;
+  difficulty: string;
+  estimatedDuration: string;
+  progress?: number;
+  updatedAt: string;
+}
 
 export function Dashboard() {
   const { user, logout } = useAuthStore();
+  const [recentCourses, setRecentCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchRecentCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await courseAPI.getCourses({ limit: 3 });
+        if (response.success && response.data?.courses) {
+          setRecentCourses(response.data.courses);
+        }
+      } catch (error) {
+        console.error('Error fetching recent courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentCourses();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -50,8 +84,8 @@ export function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
-                  Generate New Course
+                <Button asChild className="w-full">
+                  <Link to="/create">Generate New Course</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -87,9 +121,40 @@ export function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-500 text-center py-4">
-                  No courses yet. Create your first course!
-                </p>
+                {loading ? (
+                  <p className="text-sm text-gray-500 text-center py-4">Loading...</p>
+                ) : recentCourses.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentCourses.map((course) => (
+                      <Link
+                        key={course._id || course.id}
+                        to={`/courses/${course._id || course.id}`}
+                        className="block"
+                      >
+                        <div className="p-2 rounded border hover:bg-gray-50 transition-colors">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {course.title}
+                          </h4>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {course.difficulty} • {course.estimatedDuration}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                    <Button asChild variant="outline" size="sm" className="w-full mt-2">
+                      <Link to="/courses">View All Courses</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500 mb-3">
+                      No courses yet. Create your first course!
+                    </p>
+                    <Button asChild variant="outline" size="sm">
+                      <Link to="/create">Get Started</Link>
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
