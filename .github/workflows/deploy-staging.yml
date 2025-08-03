@@ -1,0 +1,102 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies (client)
+        run: |
+          cd client
+          pnpm install --frozen-lockfile
+
+      - name: Install dependencies (server)
+        run: |
+          cd server
+          pnpm install --frozen-lockfile
+
+      - name: Lint client
+        run: |
+          cd client
+          pnpm lint
+
+      - name: Build client
+        run: |
+          cd client
+          pnpm build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
+
+      - name: Deploy to Vercel (Preview)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+          working-directory: ./
+        env:
+          # Backend Environment Variables
+          MONGODB_URI: ${{ secrets.MONGODB_URI_STAGING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_STAGING }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN_STAGING }}
+          JWT_REFRESH_EXPIRES_IN: ${{ secrets.JWT_REFRESH_EXPIRES_IN_STAGING }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_STAGING }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET_STAGING }}
+          GOOGLE_CALLBACK_URL: ${{ secrets.GOOGLE_CALLBACK_URL_STAGING }}
+          CLIENT_URL: ${{ secrets.CLIENT_URL_STAGING }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_STAGING }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY_STAGING }}
+          NODE_ENV: staging
+
+      - name: Post-deployment health check
+        run: |
+          sleep 30
+          curl -f ${{ secrets.HEALTH_CHECK_URL_STAGING }}/api/health || exit 1
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Staging deployment successful!"
+          echo "🌐 Frontend: ${{ secrets.FRONTEND_URL_STAGING }}"
+          echo "🔗 API: ${{ secrets.API_URL_STAGING }}"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ Staging deployment failed!"
+          exit 1
