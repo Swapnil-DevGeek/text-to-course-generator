@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Topbar } from './Topbar';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -24,8 +23,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar */}
-        <Topbar />
         
         {/* Page Content */}
         <main className="flex-1 overflow-auto">

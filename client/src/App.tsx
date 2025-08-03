@@ -10,6 +10,7 @@ import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
+import { Profile } from '@/pages/Profile';
 import { AuthCallback } from '@/pages/AuthCallback';
 import { Courses } from '@/pages/Courses';
 import { CourseView } from '@/pages/CourseView';
@@ -113,6 +114,16 @@ function App() {
               } 
             />
             
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute requireAuth={true}>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
             
             {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />

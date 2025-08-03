@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../ui/breadcrumb';
 
@@ -12,9 +11,6 @@ interface TopbarProps {
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
-  title,
-  subtitle,
-  actions,
   showBreadcrumbs = true
 }) => {
   const location = useLocation();
@@ -59,9 +55,6 @@ export const Topbar: React.FC<TopbarProps> = ({
           // Keep the default name
           break;
       }
-
-      // Skip adding numeric IDs and MongoDB ObjectIds as separate breadcrumbs
-      // But add course details breadcrumb for course IDs
       const isId = /^\d+$/.test(segment) || /^[0-9a-fA-F]{24}$/.test(segment);
       
       if (!isId) {
@@ -71,7 +64,6 @@ export const Topbar: React.FC<TopbarProps> = ({
           current: isLast
         });
       } else if (index > 0 && pathSegments[index - 1] === 'courses') {
-        // Add "Course Details" breadcrumb for course IDs
         breadcrumbs.push({
           name: 'Course Details',
           href: currentPath,
@@ -85,25 +77,6 @@ export const Topbar: React.FC<TopbarProps> = ({
 
   const breadcrumbs = generateBreadcrumbs();
 
-  const getPageTitle = () => {
-    if (title) return title;
-    
-    const pathSegments = location.pathname.split('/').filter(Boolean);
-    if (pathSegments.length === 0 || pathSegments[0] === 'dashboard') {
-      return 'Dashboard';
-    }
-    
-    switch (pathSegments[0]) {
-      case 'courses':
-        return 'My Courses';
-      case 'create':
-        return 'Create Course';
-      case 'lesson-demo':
-        return 'Lesson Demo';
-      default:
-        return pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1);
-    }
-  };
 
   return (
     <div className="bg-white border-b border-gray-200">
@@ -136,32 +109,12 @@ export const Topbar: React.FC<TopbarProps> = ({
             </BreadcrumbList>
           </Breadcrumb>
         )}
-
-        {/* Title and Actions */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {getPageTitle()}
-            </h1>
-            {subtitle && (
-              <p className="text-gray-600 mt-1">
-                {subtitle}
-              </p>
-            )}
-          </div>
-          
-          {actions && (
-            <div className="flex items-center space-x-3">
-              {actions}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
 };
 
-// Specialized topbar components for common use cases
+
 export const CourseTopbar: React.FC<{
   courseName?: string;
   moduleIndex?: number;

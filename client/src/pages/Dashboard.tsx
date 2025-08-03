@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { courseAPI } from '../services/api';
 
 interface Course {
@@ -12,12 +13,11 @@ interface Course {
   description: string;
   difficulty: string;
   estimatedDuration: string;
-  progress?: number;
   updatedAt: string;
 }
 
 export function Dashboard() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,119 +39,96 @@ export function Dashboard() {
     fetchRecentCourses();
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty?.toLowerCase()) {
+      case 'beginner':
+        return 'bg-green-100 text-green-800';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'advanced':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+      {/* Header */}
+      <div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Text-to-Learn</h1>
-              <p className="text-sm text-gray-600">AI-Powered Course Generator</p>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Welcome back, {user?.name?.split(' ')[0]}
+              </h1>
+              <p className="text-gray-600 mt-1">Continue your learning journey</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                {user?.avatar && (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                )}
-                <span className="text-sm font-medium text-gray-700">
-                  {user?.name}
-                </span>
-              </div>
-              <Button variant="outline" onClick={handleLogout} size="sm">
-                Logout
-              </Button>
-            </div>
+            <Button asChild>
+              <Link to="/create">Create Course</Link>
+            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Left - Main Content */}
+          <div className="lg:col-span-3">
+            {/* Recent Courses */}
             <Card>
               <CardHeader>
-                <CardTitle>Welcome back!</CardTitle>
-                <CardDescription>
-                  Ready to create your next course?
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full">
-                  <Link to="/create">Generate New Course</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Profile</CardTitle>
-                <CardDescription>
-                  Manage your account settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-sm">
-                  <strong>Name:</strong> {user?.name}
-                </p>
-                <p className="text-sm">
-                  <strong>Email:</strong> {user?.email}
-                </p>
-                <p className="text-sm">
-                  <strong>Provider:</strong> {user?.authProvider === 'google' ? 'Google' : 'Email'}
-                </p>
-                <Button variant="outline" size="sm" className="w-full mt-4">
-                  Edit Profile
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Courses</CardTitle>
-                <CardDescription>
-                  Your recently generated courses
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Recent Courses</CardTitle>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/courses">View All</Link>
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <p className="text-sm text-gray-500 text-center py-4">Loading...</p>
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                  </div>
                 ) : recentCourses.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {recentCourses.map((course) => (
                       <Link
                         key={course._id || course.id}
                         to={`/courses/${course._id || course.id}`}
                         className="block"
                       >
-                        <div className="p-2 rounded border hover:bg-gray-50 transition-colors">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {course.title}
-                          </h4>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {course.difficulty} • {course.estimatedDuration}
-                          </p>
+                        <div className="p-4 border rounded-lg hover:border-blue-300 hover:shadow-sm transition-all">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-medium text-gray-900 mb-1">
+                                {course.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                                {course.description}
+                              </p>
+                              <span className="text-xs text-gray-500">
+                                {course.estimatedDuration}
+                              </span>
+                            </div>
+                            <Badge className={`ml-3 ${getDifficultyColor(course.difficulty)}`}>
+                              {course.difficulty}
+                            </Badge>
+                          </div>
                         </div>
                       </Link>
                     ))}
-                    <Button asChild variant="outline" size="sm" className="w-full mt-2">
-                      <Link to="/courses">View All Courses</Link>
-                    </Button>
                   </div>
                 ) : (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-gray-500 mb-3">
-                      No courses yet. Create your first course!
-                    </p>
-                    <Button asChild variant="outline" size="sm">
-                      <Link to="/create">Get Started</Link>
+                  <div className="text-center py-12">
+                    <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
+                    <p className="text-gray-500 mb-4">Create your first course to get started</p>
+                    <Button asChild>
+                      <Link to="/create">Create Course</Link>
                     </Button>
                   </div>
                 )}
