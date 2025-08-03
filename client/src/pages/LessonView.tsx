@@ -8,14 +8,83 @@ import { LessonRenderer } from '../components/LessonRenderer';
 import { Progress } from '../components/ui/progress';
 import { ReactPDFLessonExporter } from '../components/pdf/ReactPDFLessonExporter';
 import { lessonAPI, progressAPI } from '../services/api';
+import { type ContentBlock } from '../types/lesson';
 
-type ContentBlock = 
-  | { type: 'heading'; text: string; level?: 1 | 2 | 3 | 4 | 5 | 6 }
-  | { type: 'paragraph'; text: string }
-  | { type: 'code'; language: string; text: string }
-  | { type: 'video'; url: string; title?: string; description?: string }
-  | { type: 'mcq'; question: string; options: string[]; answer: number; explanation?: string };
+// API Content Block format (what the API returns)
+type APIContentBlock = 
+  | { type: 'heading'; content: string; metadata?: { level?: 1 | 2 | 3 | 4 | 5 | 6 }; order: number }
+  | { type: 'paragraph'; content: string; order: number }
+  | { type: 'code'; content: string; metadata?: { language?: string }; order: number }
+  | { type: 'video'; content: { searchQuery?: string; title?: string; description?: string; url?: string }; order: number }
+  | { type: 'quiz'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number }
+  | { type: 'mcq'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number };
 
+// Transform API content blocks to frontend format
+const transformContentBlocks = (apiBlocks: APIContentBlock[]): ContentBlock[] => {
+  return apiBlocks.map(block => {
+    switch (block.type) {
+      case 'heading':
+        return {
+          type: 'heading',
+          text: block.content,
+          level: block.metadata?.level || 2
+        };
+      case 'paragraph':
+        return {
+          type: 'paragraph',
+          text: block.content
+        };
+      case 'code':
+        return {
+          type: 'code',
+          text: block.content,
+          language: block.metadata?.language || 'text'
+        };
+      case 'video':
+        return {
+          type: 'video',
+          url: block.content.url || '',
+          title: block.content.title,
+          description: block.content.description,
+          searchQuery: block.content.searchQuery
+        };
+      case 'quiz':
+      case 'mcq':
+        return {
+          type: 'mcq',
+          question: block.content.question,
+          options: block.content.options,
+          answer: block.content.correctAnswer,
+          explanation: block.content.explanation
+        };
+      default:
+        // Fallback for unknown types
+        return {
+          type: 'paragraph',
+          text: `Unknown content type: ${(block as any).type}`
+        };
+    }
+  });
+};
+
+// API Lesson Data format
+interface APILessonData {
+  _id: string;
+  title: string;
+  description: string;
+  content: APIContentBlock[];
+  estimatedDuration?: string;
+  completed?: boolean;
+  courseId: string;
+  courseName: string;
+  moduleIndex: number;
+  lessonIndex: number;
+  totalModules: number;
+  totalLessonsInModule: number;
+  moduleTitle: string;
+}
+
+// Frontend Lesson Data format
 interface LessonData {
   _id: string;
   title: string;
@@ -65,7 +134,13 @@ export const LessonView: React.FC = () => {
         ]);
         
         if (lessonResponse.success && lessonResponse.data) {
-          setLesson(lessonResponse.data);
+          // Transform API data to frontend format
+          const apiLesson = lessonResponse.data as APILessonData;
+          const transformedLesson: LessonData = {
+            ...apiLesson,
+            content: transformContentBlocks(apiLesson.content)
+          };
+          setLesson(transformedLesson);
           setStartTime(Date.now());
           
           // Update current position

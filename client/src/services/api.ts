@@ -274,9 +274,12 @@ export const progressAPI = {
 export const youtubeAPI = {
   // Search for videos
   searchVideos: async (query: string, options: { maxResults?: number; duration?: string; language?: string } = {}) => {
-    const params = new URLSearchParams({
-      query,
-      ...options
+    const params = new URLSearchParams();
+    params.append('query', query);
+    Object.entries(options).forEach(([key, value]) => {
+      if (value !== undefined) {
+        params.append(key, String(value));
+      }
     });
     const response = await apiService.get(`/youtube/search?${params.toString()}`);
     return response.data;

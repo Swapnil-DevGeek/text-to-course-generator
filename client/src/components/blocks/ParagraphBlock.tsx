@@ -1,9 +1,5 @@
 import React from 'react';
-
-interface ParagraphBlockData {
-  type: 'paragraph';
-  text: string;
-}
+import { type ParagraphBlockData } from '../../types/lesson';
 
 interface ParagraphBlockProps {
   block: ParagraphBlockData;

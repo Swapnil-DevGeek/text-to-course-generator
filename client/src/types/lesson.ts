@@ -24,6 +24,7 @@ export interface VideoBlockData extends BaseContentBlock {
   url: string;
   title?: string;
   description?: string;
+  searchQuery?: string;
 }
 
 export interface MCQBlockData extends BaseContentBlock {

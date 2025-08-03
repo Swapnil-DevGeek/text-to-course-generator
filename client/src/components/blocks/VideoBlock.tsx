@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { youtubeAPI } from '../../services/api';
-
-interface VideoBlockData {
-  type: 'video';
-  url?: string;
-  searchQuery?: string;
-  title?: string;
-  description?: string;
-}
+import { type VideoBlockData } from '../../types/lesson';
 
 interface VideoBlockProps {
   block: VideoBlockData;

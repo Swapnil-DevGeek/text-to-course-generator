@@ -7,7 +7,7 @@ interface ErrorMessageProps {
   message: string;
   onRetry?: () => void;
   retryText?: string;
-  variant?: 'default' | 'destructive' | 'warning';
+  variant?: 'default' | 'destructive';
   className?: string;
   showIcon?: boolean;
 }
@@ -27,12 +27,6 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
         return (
           <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      case 'warning':
-        return (
-          <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         );
       default:
@@ -119,7 +113,7 @@ export const NotFoundError: React.FC<{
     message={`The ${resource} you're looking for doesn't exist or has been moved.`}
     onRetry={onGoBack}
     retryText="Go Back"
-    variant="warning"
+    variant="default"
     className={className}
   />
 );

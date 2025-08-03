@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface HeadingBlockData {
-  type: 'heading';
-  text: string;
-  level?: 1 | 2 | 3 | 4 | 5 | 6;
-}
+import { type HeadingBlockData } from '../../types/lesson';
 
 interface HeadingBlockProps {
   block: HeadingBlockData;
@@ -12,8 +7,6 @@ interface HeadingBlockProps {
 
 export const HeadingBlock: React.FC<HeadingBlockProps> = ({ block }) => {
   const { text, level = 2 } = block;
-  
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
   
   const getHeadingStyles = (level: number) => {
     switch (level) {
@@ -34,9 +27,25 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({ block }) => {
     }
   };
 
-  return (
-    <HeadingTag className={getHeadingStyles(level)}>
-      {text}
-    </HeadingTag>
-  );
+  const headingProps = {
+    className: getHeadingStyles(level),
+    children: text
+  };
+
+  switch (level) {
+    case 1:
+      return <h1 {...headingProps} />;
+    case 2:
+      return <h2 {...headingProps} />;
+    case 3:
+      return <h3 {...headingProps} />;
+    case 4:
+      return <h4 {...headingProps} />;
+    case 5:
+      return <h5 {...headingProps} />;
+    case 6:
+      return <h6 {...headingProps} />;
+    default:
+      return <h2 {...headingProps} />;
+  }
 };

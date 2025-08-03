@@ -9,33 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../components/ui/badge';
 import { CourseGenerationStatus, GenerationSuccess } from '../components/ui/GenerationStatus';
 import { courseAPI } from '../services/api';
-// Temporary inline types to avoid import issues
-interface AIGeneratedCourse {
-  title: string;
-  description: string;
-  tags: string[];
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  estimatedDuration: string;
-  modules: Array<{
-    id: string;
-    title: string;
-    description: string;
-    estimatedDuration: string;
-    lessons: Array<{
-      id: string;
-      title: string;
-      description: string;
-      objectives: string[];
-      estimatedDuration: string;
-    }>;
-  }>;
-}
-
-interface CourseGenerationRequest {
-  topic: string;
-  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
-  duration?: string;
-}
+import { type AIGeneratedCourseWithId, type CourseGenerationRequest } from '../types/ai';
 
 export const CreateCourse: React.FC = () => {
   const navigate = useNavigate();
@@ -49,7 +23,7 @@ export const CreateCourse: React.FC = () => {
   // Generation state
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
-  const [generatedCourse, setGeneratedCourse] = useState<AIGeneratedCourse | null>(null);
+  const [generatedCourse, setGeneratedCourse] = useState<AIGeneratedCourseWithId | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Validation

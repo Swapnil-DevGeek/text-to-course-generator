@@ -4,60 +4,25 @@ import { ParagraphBlock } from './blocks/ParagraphBlock';
 import { CodeBlock } from './blocks/CodeBlock';
 import { VideoBlock } from './blocks/VideoBlock';
 import { MCQBlock } from './blocks/MCQBlock';
-
-type ContentBlock = 
-  | { type: 'heading'; content: string; metadata?: { level?: 1 | 2 | 3 | 4 | 5 | 6 }; order: number }
-  | { type: 'paragraph'; content: string; order: number }
-  | { type: 'code'; content: string; metadata?: { language?: string }; order: number }
-  | { type: 'video'; content: any; order: number }
-  | { type: 'quiz'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number }
-  | { type: 'mcq'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number };
-
-interface LessonRendererProps {
-  content: ContentBlock[];
-}
+import { type ContentBlock, type LessonRendererProps } from '../types/lesson';
 
 export const LessonRenderer: React.FC<LessonRendererProps> = ({ content }) => {
   const renderBlock = (block: ContentBlock, index: number) => {
     switch (block.type) {
       case 'heading':
-        return <HeadingBlock key={index} block={{
-          type: 'heading',
-          text: block.content,
-          level: block.metadata?.level || 1
-        }} />;
+        return <HeadingBlock key={index} block={block} />;
       
       case 'paragraph':
-        return <ParagraphBlock key={index} block={{
-          type: 'paragraph',
-          text: block.content
-        }} />;
+        return <ParagraphBlock key={index} block={block} />;
       
       case 'code':
-        return <CodeBlock key={index} block={{
-          type: 'code',
-          language: block.metadata?.language || 'text',
-          text: block.content
-        }} />;
+        return <CodeBlock key={index} block={block} />;
       
       case 'video':
-        return <VideoBlock key={index} block={{
-          type: 'video',
-          url: block.content?.url,
-          searchQuery: block.content?.searchQuery,
-          title: block.content?.title,
-          description: block.content?.description
-        }} />;
+        return <VideoBlock key={index} block={block} />;
       
-      case 'quiz':
       case 'mcq':
-        return <MCQBlock key={index} block={{
-          type: 'mcq',
-          question: block.content.question,
-          options: block.content.options,
-          answer: block.content.correctAnswer,
-          explanation: block.content.explanation
-        }} />;
+        return <MCQBlock key={index} block={block} />;
       
       default:
         console.warn(`Unknown block type: ${(block as any).type}`);

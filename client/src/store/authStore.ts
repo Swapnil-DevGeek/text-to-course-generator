@@ -193,7 +193,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       // Google OAuth actions
-      loginWithGoogle: (token: string) => {
+      loginWithGoogle: () => {
         // This will be handled via redirect in the backend
         // The frontend will receive tokens via URL params
         window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/google`;

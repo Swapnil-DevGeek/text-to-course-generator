@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { Button } from '../ui/button';
-
-// LessonView ContentBlock format
-type LessonViewContentBlock = 
-  | { type: 'heading'; content: string; metadata?: { level?: 1 | 2 | 3 | 4 | 5 | 6 }; order: number }
-  | { type: 'paragraph'; content: string; order: number }
-  | { type: 'code'; content: string; metadata?: { language?: string }; order: number }
-  | { type: 'video'; content: any; order: number }
-  | { type: 'quiz'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number }
-  | { type: 'mcq'; content: { question: string; options: string[]; correctAnswer: number; explanation?: string }; order: number };
+import { type ContentBlock } from '../../types/lesson';
 
 interface LessonData {
   _id: string;
   title: string;
   description: string;
-  content: LessonViewContentBlock[];
+  content: ContentBlock[];
   estimatedDuration?: string;
   courseId: string;
   courseName: string;
@@ -314,40 +306,39 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
     return languageMap[lang.toLowerCase()] || lang.toUpperCase();
   };
 
-  const renderContentBlock = (block: LessonViewContentBlock) => {
+  const renderContentBlock = (block: ContentBlock, index: number) => {
     switch (block.type) {
       case 'heading':
         return (
-          <Text key={block.order} style={getHeadingStyle(block.metadata?.level)}>
-            {block.content || 'Untitled Section'}
+          <Text key={index} style={getHeadingStyle(block.level)}>
+            {block.text || 'Untitled Section'}
           </Text>
         );
 
       case 'paragraph':
         return (
-          <Text key={block.order} style={styles.paragraph}>
-            {block.content || ''}
+          <Text key={index} style={styles.paragraph}>
+            {block.text || ''}
           </Text>
         );
 
       case 'code':
         return (
-          <View key={block.order} style={styles.codeBlock} wrap={false}>
+          <View key={index} style={styles.codeBlock} wrap={false}>
             <View style={styles.codeHeader}>
-              <Text>{getLanguageLabel(block.metadata?.language)}</Text>
+              <Text>{getLanguageLabel(block.language)}</Text>
             </View>
             <View style={styles.codeContent}>
-              <Text>{block.content || 'No code content available'}</Text>
+              <Text>{block.text || 'No code content available'}</Text>
             </View>
           </View>
         );
 
       case 'video':
-        const videoData = block.content || {};
-        const { url, searchQuery, title, description } = videoData;
+        const { url, title, description } = block;
         
         return (
-          <View key={block.order} style={styles.videoBlock} wrap={false}>
+          <View key={index} style={styles.videoBlock} wrap={false}>
             <Text style={styles.videoTitle}>
               {title || 'Video Content'}
             </Text>
@@ -366,26 +357,8 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
               )}
               
               {/* Show search query and links if no direct URL */}
-              {searchQuery && !url && (
-                <View>
-                  <Text style={styles.videoDescription}>
-                    Search for: "{searchQuery}"
-                  </Text>
-                  <View style={{ marginTop: 5 }}>
-                    <Text style={styles.videoLink}>
-                      YouTube: https://www.youtube.com/results?search_query={encodeURIComponent(searchQuery)}
-                    </Text>
-                  </View>
-                  <View style={{ marginTop: 3 }}>
-                    <Text style={styles.videoLink}>
-                      Google: https://www.google.com/search?q={encodeURIComponent(searchQuery + ' video tutorial')}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              
-              {/* Fallback when neither URL nor search query */}
-              {!url && !searchQuery && (
+              {/* Fallback when no URL */}
+              {!url && (
                 <Text style={styles.videoDescription}>
                   Video content related to this lesson topic
                 </Text>
@@ -394,24 +367,22 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
           </View>
         );
 
-      case 'quiz':
       case 'mcq':
-        const mcqData = block.content || {};
-        const { question = '', options = [], correctAnswer = 0, explanation } = mcqData;
+        const { question = '', options = [], answer = 0, explanation } = block;
         
         if (!question || options.length === 0) {
           return (
-            <View key={block.order} style={styles.mcqBlock} wrap={false}>
+            <View key={index} style={styles.mcqBlock} wrap={false}>
               <Text style={styles.mcqTitle}>Multiple Choice Question</Text>
               <Text style={styles.mcqQuestion}>Invalid or missing question data</Text>
             </View>
           );
         }
 
-        const validAnswer = correctAnswer >= 0 && correctAnswer < options.length ? correctAnswer : 0;
+        const validAnswer = answer >= 0 && answer < options.length ? answer : 0;
 
         return (
-          <View key={block.order} style={styles.mcqBlock} wrap={false}>
+          <View key={index} style={styles.mcqBlock} wrap={false}>
             <Text style={styles.mcqTitle}>Multiple Choice Question</Text>
             
             <Text style={styles.mcqQuestion}>{question}</Text>
@@ -451,7 +422,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
 
       default:
         return (
-          <Text key={block.order} style={styles.paragraph}>
+          <Text key={index} style={styles.paragraph}>
             Unknown content type: {(block as any).type}
           </Text>
         );
@@ -459,7 +430,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
   };
 
   // Sort content blocks by order
-  const sortedContent = [...(lesson.content || [])].sort((a, b) => a.order - b.order);
+  const sortedContent = [...(lesson.content || [])];
 
   return (
     <Document>
@@ -481,7 +452,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
         {/* Content */}
         <View style={styles.content}>
           {sortedContent.length > 0 ? (
-            sortedContent.map(renderContentBlock)
+            sortedContent.map((block, index) => renderContentBlock(block, index))
           ) : (
             <Text style={styles.paragraph}>
               <Text>No content available for this lesson.</Text>

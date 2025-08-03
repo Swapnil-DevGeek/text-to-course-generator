@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
-
-interface CodeBlockData {
-  type: 'code';
-  language: string;
-  text: string;
-}
+import { type CodeBlockData } from '../../types/lesson';
 
 interface CodeBlockProps {
   block: CodeBlockData;

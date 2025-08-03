@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-
-interface MCQBlockData {
-  type: 'mcq';
-  question: string;
-  options: string[];
-  answer: number;
-  explanation?: string;
-}
+import { type MCQBlockData } from '../../types/lesson';
 
 interface MCQBlockProps {
   block: MCQBlockData;
@@ -17,7 +10,6 @@ interface MCQBlockProps {
 export const MCQBlock: React.FC<MCQBlockProps> = ({ block }) => {
   const { question, options, answer, explanation } = block;
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
 
   const handleOptionSelect = (optionIndex: number) => {
@@ -27,13 +19,11 @@ export const MCQBlock: React.FC<MCQBlockProps> = ({ block }) => {
 
   const handleSubmit = () => {
     if (selectedOption === null) return;
-    setShowResult(true);
     setHasAnswered(true);
   };
 
   const handleReset = () => {
     setSelectedOption(null);
-    setShowResult(false);
     setHasAnswered(false);
   };
 

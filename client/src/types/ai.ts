@@ -25,6 +25,10 @@ export interface AIGeneratedCourse {
   modules: AIGeneratedModule[];
 }
 
+export interface AIGeneratedCourseWithId extends AIGeneratedCourse {
+  _id: string;
+}
+
 // Content block types for lesson generation
 export interface ContentBlock {
   type: 'heading' | 'paragraph' | 'code' | 'video' | 'mcq';
@@ -127,13 +131,18 @@ export interface GeminiResponse {
 
 // Error types
 export class AIGenerationError extends Error {
+  public code: string;
+  public details?: any;
+
   constructor(
     message: string,
-    public code: string,
-    public details?: any
+    code: string,
+    details?: any
   ) {
     super(message);
     this.name = 'AIGenerationError';
+    this.code = code;
+    this.details = details;
   }
 }
 
@@ -144,7 +153,10 @@ export class InvalidJSONError extends AIGenerationError {
 }
 
 export class APIError extends AIGenerationError {
-  constructor(message: string, public statusCode?: number) {
+  public statusCode?: number;
+
+  constructor(message: string, statusCode?: number) {
     super(message, 'API_ERROR', { statusCode });
+    this.statusCode = statusCode;
   }
 }

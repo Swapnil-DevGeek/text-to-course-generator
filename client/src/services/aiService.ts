@@ -1,11 +1,11 @@
-import type {
-  AIGeneratedCourse,
-  AIGeneratedLessonContent,
-  CourseGenerationRequest,
-  LessonGenerationRequest,
-  AIResponse,
-  GeminiRequest,
-  GeminiResponse,
+import {
+  type AIGeneratedCourse,
+  type AIGeneratedLessonContent,
+  type CourseGenerationRequest,
+  type LessonGenerationRequest,
+  type AIResponse,
+  type GeminiRequest,
+  type GeminiResponse,
   AIGenerationError,
   InvalidJSONError,
   APIError
@@ -62,7 +62,7 @@ class AIService {
         });
 
         if (!response.ok) {
-          const errorData = await response.text();
+          await response.text(); // consume the response
           throw new APIError(`API request failed: ${response.status} ${response.statusText}`, response.status);
         }
 

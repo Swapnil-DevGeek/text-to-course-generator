@@ -191,7 +191,7 @@ export const LessonPDFExporter: React.FC<LessonPDFExporterProps> = ({
         const blockPositions: number[] = [];
         
         blockElements.forEach((block) => {
-          const rect = (block as HTMLElement).getBoundingClientRect();
+          (block as HTMLElement).getBoundingClientRect(); // ensure element is measured
           const elementTop = (block as HTMLElement).offsetTop;
           blockPositions.push(elementTop * scale);
         });
