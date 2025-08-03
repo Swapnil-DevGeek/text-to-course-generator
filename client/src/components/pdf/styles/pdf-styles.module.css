@@ -1,0 +1,325 @@
+/* PDF Export Styles - Optimized for print and PDF generation */
+
+.pdfContainer {
+  /* A4 page dimensions at 96 DPI */
+  width: 794px; /* 8.27 inches * 96 DPI */
+  min-height: 1123px; /* 11.69 inches * 96 DPI */
+  background: white;
+  font-family: 'Times New Roman', serif;
+  font-size: 12pt;
+  line-height: 1.6;
+  color: #000000;
+  padding: 72px; /* 0.75 inch margin on all sides */
+  box-sizing: border-box;
+  position: relative;
+}
+
+.pdfHeader {
+  border-bottom: 2px solid #333;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.pdfTitle {
+  font-family: 'Arial', sans-serif;
+  font-size: 24pt;
+  font-weight: bold;
+  color: #2563eb;
+  margin: 0 0 10px 0;
+}
+
+.pdfSubtitle {
+  font-family: 'Arial', sans-serif;
+  font-size: 14pt;
+  color: #64748b;
+  margin: 0 0 5px 0;
+}
+
+.pdfMetadata {
+  font-size: 10pt;
+  color: #64748b;
+  margin: 0;
+}
+
+.pdfContent {
+  margin-bottom: 50px;
+}
+
+/* Heading styles */
+.pdfHeading1 {
+  font-family: 'Arial', sans-serif;
+  font-size: 20pt;
+  font-weight: bold;
+  color: #1e40af;
+  margin: 30px 0 15px 0;
+  page-break-after: avoid;
+}
+
+.pdfHeading2 {
+  font-family: 'Arial', sans-serif;
+  font-size: 18pt;
+  font-weight: bold;
+  color: #2563eb;
+  margin: 25px 0 12px 0;
+  page-break-after: avoid;
+}
+
+.pdfHeading3 {
+  font-family: 'Arial', sans-serif;
+  font-size: 16pt;
+  font-weight: bold;
+  color: #3b82f6;
+  margin: 20px 0 10px 0;
+  page-break-after: avoid;
+}
+
+.pdfHeading4 {
+  font-family: 'Arial', sans-serif;
+  font-size: 14pt;
+  font-weight: bold;
+  color: #3b82f6;
+  margin: 18px 0 8px 0;
+  page-break-after: avoid;
+}
+
+.pdfHeading5 {
+  font-family: 'Arial', sans-serif;
+  font-size: 13pt;
+  font-weight: bold;
+  color: #3b82f6;
+  margin: 15px 0 6px 0;
+  page-break-after: avoid;
+}
+
+.pdfHeading6 {
+  font-family: 'Arial', sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #3b82f6;
+  margin: 12px 0 4px 0;
+  page-break-after: avoid;
+}
+
+/* Paragraph styles */
+.pdfParagraph {
+  margin: 0 0 15px 0;
+  text-align: justify;
+  text-indent: 0;
+}
+
+/* Code block styles */
+.pdfCodeBlock {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin: 20px 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  display: block;
+}
+
+.pdfCodeHeader {
+  background-color: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+  padding: 8px 15px;
+  font-family: 'Arial', sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+  color: #495057;
+}
+
+.pdfCodeContent {
+  padding: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 10pt;
+  line-height: 1.4;
+  white-space: pre;
+  overflow-wrap: break-word;
+  color: #212529;
+}
+
+/* MCQ styles */
+.pdfMcqBlock {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin: 20px 0;
+  padding: 20px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  display: block;
+  min-height: 150px; /* Ensure minimum space requirement */
+}
+
+.pdfMcqBlock::before {
+  content: '';
+  display: block;
+  height: 1px;
+  page-break-before: auto;
+}
+
+.pdfMcqTitle {
+  font-family: 'Arial', sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #495057;
+  margin: 0 0 15px 0;
+}
+
+.pdfMcqQuestion {
+  font-size: 12pt;
+  font-weight: bold;
+  color: #212529;
+  margin: 0 0 15px 0;
+  line-height: 1.5;
+}
+
+.pdfMcqOptions {
+  margin: 15px 0;
+}
+
+.pdfMcqOption {
+  margin: 8px 0;
+  padding-left: 30px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.pdfMcqOptionLabel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: bold;
+  width: 20px;
+}
+
+.pdfMcqOptionCorrect {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+  padding: 5px 10px 5px 25px;
+  margin: 8px 0;
+  position: relative;
+}
+
+.pdfMcqAnswer {
+  margin: 15px 0 10px 0;
+  padding: 10px;
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+}
+
+.pdfMcqAnswerTitle {
+  font-weight: bold;
+  color: #155724;
+  margin: 0 0 5px 0;
+}
+
+.pdfMcqExplanation {
+  margin: 10px 0 0 0;
+  padding: 10px;
+  background-color: #e2f3ff;
+  border-left: 4px solid #2563eb;
+}
+
+.pdfMcqExplanationTitle {
+  font-weight: bold;
+  color: #1e40af;
+  margin: 0 0 5px 0;
+}
+
+/* Video block styles */
+.pdfVideoBlock {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin: 20px 0;
+  padding: 20px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  display: block;
+}
+
+.pdfVideoTitle {
+  font-family: 'Arial', sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: #495057;
+  margin: 0 0 10px 0;
+}
+
+.pdfVideoContent {
+  font-size: 12pt;
+  line-height: 1.5;
+}
+
+.pdfVideoDescription {
+  color: #6c757d;
+  margin: 5px 0;
+  font-style: italic;
+}
+
+.pdfVideoLink {
+  color: #2563eb;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+/* Footer styles */
+.pdfFooter {
+  position: absolute;
+  bottom: 30px;
+  left: 72px;
+  right: 72px;
+  border-top: 1px solid #dee2e6;
+  padding-top: 10px;
+  font-size: 10pt;
+  color: #6c757d;
+  text-align: center;
+}
+
+/* Print optimizations */
+@media print {
+  .pdfContainer {
+    margin: 0;
+    padding: 1in;
+    font-size: 11pt;
+  }
+  
+  .pdfTitle {
+    font-size: 18pt;
+  }
+  
+  .pdfHeading1 {
+    font-size: 16pt;
+  }
+  
+  .pdfHeading2 {
+    font-size: 14pt;
+  }
+  
+  .pdfCodeContent {
+    font-size: 9pt;
+  }
+}
+
+/* Utility classes */
+.pageBreakBefore {
+  page-break-before: always;
+}
+
+.pageBreakAfter {
+  page-break-after: always;
+}
+
+.pageBreakAvoid {
+  page-break-inside: avoid;
+}
+
+.pdfHidden {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  visibility: hidden;
+  width: 794px;
+  background: white;
+}

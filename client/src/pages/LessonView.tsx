@@ -3,10 +3,10 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
-import { InlineLoader } from '../components/ui/LoadingSpinner';
 import { NotFoundError } from '../components/ui/ErrorMessage';
 import { LessonRenderer } from '../components/LessonRenderer';
 import { Progress } from '../components/ui/progress';
+import { ReactPDFLessonExporter } from '../components/pdf/ReactPDFLessonExporter';
 import { lessonAPI, progressAPI } from '../services/api';
 
 type ContentBlock = 
@@ -204,6 +204,11 @@ export const LessonView: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-3">
+              <ReactPDFLessonExporter 
+                lesson={lesson}
+                variant="outline"
+                size="sm"
+              />
               <Progress 
                 value={((lesson.lessonIndex + 1) / lesson.totalLessonsInModule) * 100}
                 className="w-32"
