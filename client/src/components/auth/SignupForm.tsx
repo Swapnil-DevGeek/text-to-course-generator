@@ -52,7 +52,7 @@ export function SignupForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     try {
-      const { confirmPassword, ...registerData } = data;
+      const { confirmPassword: _confirmPassword, ...registerData } = data;
       await registerUser(registerData);
       toast({
         title: 'Account created successfully',

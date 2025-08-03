@@ -334,7 +334,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
           </View>
         );
 
-      case 'video':
+      case 'video': {
         const { url, title, description } = block;
         
         return (
@@ -366,8 +366,9 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
             </View>
           </View>
         );
+      }
 
-      case 'mcq':
+      case 'mcq': {
         const { question = '', options = [], answer = 0, explanation } = block;
         
         if (!question || options.length === 0) {
@@ -419,6 +420,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
             )}
           </View>
         );
+      }
 
       default:
         return (

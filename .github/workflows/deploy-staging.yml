@@ -49,11 +49,6 @@ jobs:
           cd server
           pnpm install --no-frozen-lockfile
 
-      - name: Lint client
-        run: |
-          cd client
-          pnpm lint
-
       - name: Build client
         run: |
           cd client

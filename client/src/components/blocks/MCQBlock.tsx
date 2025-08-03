@@ -28,7 +28,7 @@ export const MCQBlock: React.FC<MCQBlockProps> = ({ block }) => {
   };
 
   const getOptionClassName = (optionIndex: number) => {
-    let baseClasses = "p-3 border rounded-lg cursor-pointer transition-all duration-200 text-left";
+    const baseClasses = "p-3 border rounded-lg cursor-pointer transition-all duration-200 text-left";
     
     if (!hasAnswered) {
       if (selectedOption === optionIndex) {

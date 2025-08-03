@@ -29,7 +29,7 @@ export const PDFParagraphBlock: React.FC<PDFParagraphBlockProps> = ({ block }) =
     
     return lines.map((line, index) => {
       // Handle bold text
-      let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       
       return (
         <span 
