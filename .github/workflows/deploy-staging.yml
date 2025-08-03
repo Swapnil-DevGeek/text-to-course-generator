@@ -56,12 +56,13 @@ jobs:
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL_STAGING }}
 
-      - name: Deploy to Vercel (Preview)
+      - name: Deploy to Vercel (Staging)
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+          vercel-args: '--prod'
           working-directory: ./
         env:
           # Backend Environment Variables
@@ -76,6 +77,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_STAGING }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY_STAGING }}
           NODE_ENV: staging
+        continue-on-error: false
+        timeout-minutes: 10
 
       - name: Post-deployment health check
         run: |
