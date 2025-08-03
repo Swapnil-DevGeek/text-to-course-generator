@@ -89,12 +89,29 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    database: cachedDb ? 'connected' : 'disconnected'
+  });
+});
+
+// Handle both /auth and /api/auth patterns for flexibility
 app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/courses', courseRoutes);
+app.use('/api/courses', courseRoutes);
 app.use('/modules', moduleRoutes);
+app.use('/api/modules', moduleRoutes);
 app.use('/lessons', lessonRoutes);
+app.use('/api/lessons', lessonRoutes);
 app.use('/progress', progressRoutes);
+app.use('/api/progress', progressRoutes);
 app.use('/youtube', youtubeRoutes);
+app.use('/api/youtube', youtubeRoutes);
 
 // Error handlers
 app.use('*', (req, res) => {

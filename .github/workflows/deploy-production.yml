@@ -77,6 +77,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_PROD }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY_PROD }}
           NODE_ENV: production
+        continue-on-error: false
+        timeout-minutes: 10
 
       - name: Post-deployment health check
         run: |
