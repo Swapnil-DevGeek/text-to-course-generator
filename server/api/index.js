@@ -32,10 +32,10 @@ async function connectToDatabase() {
     
     const connection = await mongoose.connect(process.env.MONGODB_URI, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000, // Increased timeout
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      bufferCommands: false,
-      bufferMaxEntries: 0
+      bufferCommands: false
+      // Removed bufferMaxEntries as it's not supported in newer MongoDB versions
     });
     
     console.log('Successfully connected to MongoDB');
