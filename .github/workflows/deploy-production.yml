@@ -81,7 +81,7 @@ jobs:
       - name: Post-deployment health check
         run: |
           sleep 30
-          curl -f ${{ secrets.HEALTH_CHECK_URL_PROD }}/api/health || exit 1
+          curl -f https://course-craft-amber.vercel.app/api/health || exit 1
 
       - name: Notify deployment success
         if: success()
