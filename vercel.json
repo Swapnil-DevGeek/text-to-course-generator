@@ -19,8 +19,12 @@
       "dest": "/server/api/index.js"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "/client/assets/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client/$1"
+      "dest": "/client/index.html"
     }
   ],
   "outputDirectory": "client/dist",
