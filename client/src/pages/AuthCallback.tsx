@@ -66,7 +66,7 @@ export function AuthCallback() {
             setUser(response.data.user);
             toast({
               title: 'Login successful',
-              description: 'Welcome to Text-to-Learn!',
+              description: 'Welcome to Course Craft!',
             });
             navigate('/dashboard');
           } else {

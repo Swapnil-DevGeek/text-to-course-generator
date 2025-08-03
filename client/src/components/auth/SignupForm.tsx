@@ -56,7 +56,7 @@ export function SignupForm() {
       await registerUser(registerData);
       toast({
         title: 'Account created successfully',
-        description: 'Welcome to Text-to-Learn!',
+        description: 'Welcome to Course Craft!',
       });
       navigate('/dashboard');
     } catch (error: any) {

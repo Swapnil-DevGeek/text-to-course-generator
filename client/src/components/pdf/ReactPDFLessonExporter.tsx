@@ -464,7 +464,7 @@ const LessonPDFDocument: React.FC<{ lesson: LessonData }> = ({ lesson }) => {
 
         {/* Footer */}
         <Text style={styles.footer} fixed>
-          {lesson.courseName} - {lesson.title} | Generated with Text-to-Learn
+          {lesson.courseName} - {lesson.title} | Generated with Course Craft
         </Text>
       </Page>
     </Document>

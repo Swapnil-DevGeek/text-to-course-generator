@@ -17,7 +17,7 @@ export function Signup() {
   return (
     <AuthLayout
       title="Create your account"
-      description="Get started with Text-to-Learn today"
+      description="Get started with Course Craft today"
     >
       <SignupForm />
     </AuthLayout>

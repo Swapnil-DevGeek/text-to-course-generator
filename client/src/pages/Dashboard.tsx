@@ -88,8 +88,23 @@ export function Dashboard() {
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                  <div className="space-y-4">
+                    {/* Skeleton loading animation */}
+                    {[1, 2, 3].map((index) => (
+                      <div key={index} className="p-4 border rounded-lg animate-pulse">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                            <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                          </div>
+                          <div className="ml-3">
+                            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : recentCourses.length > 0 ? (
                   <div className="space-y-4">

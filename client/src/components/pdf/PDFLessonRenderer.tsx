@@ -161,7 +161,7 @@ export const PDFLessonRenderer: React.FC<PDFLessonRendererProps> = ({
 
       <div className={styles.pdfFooter}>
         <div>
-          {lesson.courseName} - {lesson.title} | Page 1 | Generated with Text-to-Learn
+          {lesson.courseName} - {lesson.title} | Page 1 | Generated with Course Craft
         </div>
       </div>
     </div>
