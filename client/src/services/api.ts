@@ -8,7 +8,12 @@ interface AuthTokens {
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (
-  import.meta.env.PROD ? '/api' : 'http://localhost:3000/api'
+  // Check if we're on the production domain
+  typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') 
+    ? '/api' 
+    : import.meta.env.PROD 
+      ? '/api' 
+      : 'http://localhost:3000/api'
 );
 
 class ApiService {
