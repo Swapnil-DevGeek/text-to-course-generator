@@ -43,7 +43,8 @@ export const LessonRenderer: React.FC<LessonRendererProps> = ({ content }) => {
       case 'video':
         return <VideoBlock key={index} block={{
           type: 'video',
-          url: block.content?.url || '',
+          url: block.content?.url,
+          searchQuery: block.content?.searchQuery,
           title: block.content?.title,
           description: block.content?.description
         }} />;

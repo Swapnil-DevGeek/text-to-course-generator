@@ -270,5 +270,36 @@ export const progressAPI = {
   }
 };
 
+// YouTube API functions
+export const youtubeAPI = {
+  // Search for videos
+  searchVideos: async (query: string, options: { maxResults?: number; duration?: string; language?: string } = {}) => {
+    const params = new URLSearchParams({
+      query,
+      ...options
+    });
+    const response = await apiService.get(`/youtube/search?${params.toString()}`);
+    return response.data;
+  },
+
+  // Get video details by ID
+  getVideoDetails: async (videoId: string) => {
+    const response = await apiService.get(`/youtube/video/${videoId}`);
+    return response.data;
+  },
+
+  // Get cache statistics (for debugging)
+  getCacheStats: async () => {
+    const response = await apiService.get('/youtube/cache/stats');
+    return response.data;
+  },
+
+  // Clear cache (for debugging)
+  clearCache: async () => {
+    const response = await apiService.delete('/youtube/cache');
+    return response.data;
+  }
+};
+
 // Export singleton instance
 export const apiService = new ApiService();

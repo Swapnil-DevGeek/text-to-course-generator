@@ -143,34 +143,54 @@ Generate the course outline now:`;
   }
 
   generateLessonPrompt(courseTitle, moduleTitle, lessonTitle) {
-    return `You are an expert instructional designer. Create detailed lesson content for:
+    return `You are an expert instructional designer. Create comprehensive, detailed lesson content for:
 
 COURSE: ${courseTitle}
 MODULE: ${moduleTitle}
 LESSON: ${lessonTitle}
 
 CONTENT REQUIREMENTS:
-1. Start with clear learning objectives
-2. Include various content block types:
-   - headings (h1-h6) for structure
-   - paragraphs for explanations
-   - code blocks (when relevant to topic)
-   - video search queries (not direct links)
-   - Multiple choice questions (4-5 MCQs at the end)
+Create a DETAILED lesson with substantial content (15-25 content blocks minimum). Structure it as follows:
 
-3. MCQ Rules:
-   - Include 4-5 questions that test understanding
-   - Provide clear explanations for correct answers
-   - Make options realistic and challenging
+1. INTRODUCTION SECTION:
+   - Clear learning objectives (3-5 objectives)
+   - Overview paragraph explaining what will be covered
+   - Relevant introductory video (ALWAYS include for main concepts)
 
-4. Video Rules:
-   - Provide search queries, not direct URLs
-   - Example: "machine learning basics tutorial" not "https://youtube.com/..."
+2. MAIN CONTENT SECTIONS (3-5 sections):
+   Each section should include:
+   - Section heading (h2)
+   - Detailed explanatory paragraphs (2-3 per section)
+   - Specific educational videos for key concepts
+   - Code examples when relevant to topic
+   - Sub-headings (h3) for organization
 
-5. Code Rules:
-   - Include code blocks only when relevant to the lesson topic
-   - Use appropriate programming languages
-   - Include practical, runnable examples
+3. PRACTICAL APPLICATION:
+   - Hands-on examples or exercises
+   - Relevant tutorial videos
+   - Step-by-step explanations
+
+4. ASSESSMENT:
+   - 4-5 comprehensive MCQs testing understanding
+   - Include explanations for correct answers
+
+CONTENT BLOCK RULES:
+- Paragraphs: Write substantial content (3-5 sentences minimum per paragraph)
+- Videos: Include 2-3 video search queries per lesson for different concepts
+- Code: Include practical, runnable examples when topic-relevant
+- Headings: Use proper hierarchy (h1 for main title, h2 for sections, h3 for subsections)
+
+VIDEO SEARCH QUERY RULES:
+- Provide specific, educational search queries
+- Include lesson topic keywords for relevance  
+- Examples: "${lessonTitle} tutorial", "${courseTitle} ${lessonTitle} explained", "learn ${lessonTitle} step by step"
+- Make them educational/tutorial focused
+
+CODE RULES:
+- Include working code examples when relevant to the lesson topic
+- Use appropriate programming languages for the subject
+- Provide complete, runnable examples with comments
+- Include both basic and advanced examples when appropriate
 
 OUTPUT FORMAT:
 Return ONLY a JSON object with this exact structure (no markdown, no explanations):
@@ -200,7 +220,11 @@ Return ONLY a JSON object with this exact structure (no markdown, no explanation
     },
     {
       "type": "video",
-      "content": { "searchQuery": "search query for video", "title": "Video title", "description": "Video description" },
+      "content": { 
+        "searchQuery": "specific educational search query related to lesson topic",
+        "title": "Educational Video Title", 
+        "description": "Brief description of what the video covers and why it's relevant" 
+      },
       "metadata": {},
       "order": 3
     },
@@ -217,6 +241,12 @@ Return ONLY a JSON object with this exact structure (no markdown, no explanation
     }
   ]
 }
+
+IMPORTANT REMINDERS:
+- ALWAYS include 2-3 video blocks per lesson with relevant search queries
+- Make content detailed and comprehensive (15-25 blocks minimum)
+- Use specific, educational video search queries related to the lesson topic
+- Include substantial paragraph content with detailed explanations
 
 Generate the lesson content now:`;
   }

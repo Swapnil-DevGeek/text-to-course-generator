@@ -14,6 +14,7 @@ const courseRoutes = require('./routes/courses');
 const moduleRoutes = require('./routes/modules');
 const lessonRoutes = require('./routes/lessons');
 const progressRoutes = require('./routes/progress');
+const youtubeRoutes = require('./routes/youtube');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,10 +39,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Passport middleware
 app.use(passport.initialize());
 
+// Initialize services
+const youtubeService = require('./services/youtubeService');
+
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB');
+    
+    // Initialize YouTube service
+    youtubeService.initialize();
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error);
@@ -60,6 +67,7 @@ app.get('/', (req, res) => {
       modules: '/api/modules',
       lessons: '/api/lessons',
       progress: '/api/progress',
+      youtube: '/api/youtube',
       health: '/api/health'
     }
   });
@@ -70,6 +78,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/youtube', youtubeRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
