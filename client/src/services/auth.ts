@@ -179,7 +179,9 @@ class AuthService {
    * Get Google OAuth URL
    */
   getGoogleAuthUrl(): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const baseUrl = import.meta.env.VITE_API_URL || (
+      import.meta.env.PROD ? '/api' : 'http://localhost:3000/api'
+    );
     return `${baseUrl}/auth/google`;
   }
 
